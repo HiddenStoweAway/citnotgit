@@ -34,19 +34,20 @@ class cit:
     def interpret(self, src):
         db = TinyDB('db.json')
         
-        print(src)
-        
         if(src[0] == 'store'):
             if(len(src) > 1):
                 with open(src[1]) as file:
                     db.insert(
                         {
                             'Path' : src[1], 
-                            'Text:' : file.read(),
+                            'Text' : file.read(),
                             'Date' : datetime.today().__str__(),
                             'Details' : src[2]
                         }
                     )
         elif(src[0] == 'commits'):
             for d in db.all():
-                print(d)
+                c = d
+                print(c.keys())
+                c.pop('Text')
+                print(c)
