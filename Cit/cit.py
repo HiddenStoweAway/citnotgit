@@ -1,6 +1,7 @@
 from Cit import extra_str
-from tinydb import TinyDB, Query
 from termcolor import colored
+
+from google.cloud import firestore
 
 from datetime import datetime
 
@@ -33,7 +34,9 @@ class cit:
         self.interpret(tokens)
                 
     def interpret(self, src):
-        db = TinyDB('db.json')
+        db = firestore.Client(project="gitbutkit")
+        
+        files = db.collection('files')
         
         if(src[0] == 'store'):
             if(len(src) > 1):
@@ -43,22 +46,19 @@ class cit:
                     while len(src) > 2:
                         details += src.pop(2)
 
-                    db.insert(
+                    files.add(
                         {
-                            'Path' : src[1], 
+                            'Path' : src[1],
                             'Text' : file.read(),
-                            'Date' : datetime.today().__str__(),
-                            'Details' : details
+                            'Details' : details,
+                            'timestamp' : datetime.now()        
                         }
                     )
             else:
                 print("store " + colored("'filepath' 'extra details'", 'yellow'))
         elif(src[0] == 'commits'):
-            if db.all():
-                for d in db.all():
-                    c = d
-                    c.pop('Text')
-                    print(c)
+            if files.stream():
+                
             else:
                 print(colored('No Commits', 'yellow'))
         elif (src[0] == 'clear'):
